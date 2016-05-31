@@ -6,7 +6,14 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
 var routes = require('./routes/index');
+var settings = require('./settings.js');
+
 //var users = require('./routes/users');
+
+//add session
+var session = require('express-session');
+var MongoStore = require('connect-mongo')(session);
+
 
 var app = express();
 
@@ -14,6 +21,14 @@ var app = express();
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
+app.use(session({
+    secret: settings.cookieSecret,
+    key: settings.db, //cook name
+    cookie: {maxAge: 1000 * 60 * 60 * 24 * 30},//30days
+    store: new MongoStore({
+        url: 'mongodb://localhost/blog'
+    })
+}));
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(logger('dev'));
